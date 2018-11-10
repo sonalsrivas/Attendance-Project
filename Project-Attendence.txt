@@ -1,0 +1,157 @@
+// original program on 23 Sept Saturday
+//Modifications made on 26th September 2017                                                                 contrary to what was planned, didn't use linked lists.
+
+/*
+
+Depends on Academic Calender, Timetable */
+
+#include<time.h>
+#include<stdio.h>
+int count_lects(int d,int m, int wd, int ed, int em,int p)
+{   int i,j,lect,c_lect=0,m_days[]={31,29,31,30,31,30,31,31,30,31,30,31};        //No. of days in each month of the year     [[ taking feb's as 29 in view that 2018's leap]]
+    int Week[7]={8,7,8,8,8,0,0};                                        //No. of lectures on each day of the week    ((Monday to Sunday))
+    if (p==2)   { Week[1]=8; Week[4]=7; }
+//    printf("Week array contents\n");
+//    for (i=0;i<7;i++)   printf("%d ",Week[i]);
+    for(i=m;i<=em;i++)
+    {
+        for(j=(i>m)?1:d;j<=m_days[i-1];j++)
+        {
+            if(i==em&&j==ed)    break;
+            if(j==29&&i==9)
+            {    lect=0;   if(wd==6)   wd=0; else wd++; }
+            else if((i==10)&&(j==2||j==11||j==12||j==13||j==16||j==17||j==18||j==19||j==20))
+            {    lect=0;   if(wd==6)   wd=0; else wd++; }
+            else if((i==11)&&(j>17||j==1||j==2||j==3))
+            {    lect=0;   if(wd==6)   wd=0; else wd++; }
+            else
+            {    lect=Week[wd]; if(wd==6)   wd=0; else wd++; }
+//            printf("week wd for wd as %d: %d ",wd,Week[wd]);
+//            printf("lect for j as %d : %d ",j,lect);
+            c_lect=c_lect+lect;
+ //           printf("No. of lectures for j as %d : %d\n",j,c_lect);
+        }
+    }
+//    printf("No. of lectures left : %d ",c_lect);
+    return c_lect;
+}
+int main()
+{   int n,N,Q,r,lectures,End,E_m,E_d,c,p;
+    float att,Dperc,perc;
+
+    int date,month,dayNo;
+    time_t now =time(NULL);
+    struct tm*t =localtime(&now);
+    date=t->tm_mday;
+    month=t->tm_mon+1;
+    dayNo=t->tm_wday-1;
+    printf("Today's date: %d\t Month: %d\t Weekday No.: %d\n",date,month,dayNo+1);
+
+    printf("This program depends entirely on the Academic Calender, the current Time Table,\n veracity of LSA entries. Estimations here are approximate.\n\n");
+
+    printf("Enter no. of lectures you have attended : ");
+    scanf("%d",&n);
+    printf("Enter total no. of lectures : ");
+    scanf("%d",&N);
+    printf("Enter which batch you belong\n 1 for B1\n 2 for B2\n");
+    scanf("%d",&p);
+    printf("Enter __ if you are concerned about your percentage until before:\n 1 ST2\n 2 PUE\n");
+    scanf("%d",&End);
+    if(End==1)  {E_m=10;E_d=11;}
+    else if(End==2) {E_m=11;E_d=20;}
+    att=(float)n*100/(float)N;
+
+    lectures=count_lects(date,month,dayNo,E_d,E_m,p);
+
+    printf("Current Percentage : %f\n",att);
+    printf("No. of lectures left : %d\n",lectures);
+    if(att<75)
+    {
+        printf(" This program is specifically build for you. \nAlso, I hope you know you are in trouble!\n\tBtw, What do you wish to know?\n\n1 ->How many lectures  do I need to attend at the minimum to be eligible to attend the next internal exam?\n2 ->What if I attend all lectures until next internal?\n");
+
+        scanf("%d",&Q);
+        switch(Q)
+        {
+            case 1: r=(0.765*(float)(N+lectures)-n);
+                    printf("The number of lectures you need to attend to achieve the bare minimum : %d",r);
+                    if(r>lectures)        printf("I doubt you are attending the upcoming ST.");
+                    break;
+            case 2: perc=((float)(n+lectures)*100)/(float)(N+lectures);
+                    printf("Your percentage given you pull off the feat successfully : %f\n While who are you kidding!!?",perc);
+                    break;
+            default: printf("Seriously?! \n What are you doing?!!");
+        }
+    }
+    if(att>=75&& att<77)
+    {
+        printf(" Play Safe, Dudette or Dude! Plan your strategy ahead through these questions..\n\n1 ->How many lectures do I need to attend in the coming time to be just\n ahead of the Lakshmann Rekha??\n2 ->What if I attend all lectures until next internal?\n");
+        scanf("%d",&Q);
+        switch(Q)
+        {
+            case 1: r=(0.767*(N+lectures)-n);
+                    printf("The number of lectures you need to attend to achieve the bare minimum is %d out of the %d total remaining lectures.",r,lectures);
+                    if(r>lectures)        printf("I doubt you are attending the upcoming ST.");                       //This line is not of use here
+                    break;
+            case 2: perc=(float)(n+lectures)*100/(float)(N+lectures);
+                    printf("Your percentage given you pull off the feat successfully : %f",perc);
+                    break;
+            default: printf("Seriously?! \n What are you doing?!!");
+        }
+    }
+    if(att>=77&& att<90)
+    {
+        printf(" What do you wish to know?\n\n1 ->How many lectures can I leave still maintaining a particular percentage? \n2 ->(Aiming a little low) How many lectures can I leave without crossing\n the Lakshmann Rekha?\n3 ->How many lectures do I need to attend to be just ahead\n of the Lakshmann Rekha??\n4 ->What if I attend all lectures until next internal? ");
+        scanf("%d",&Q);
+        switch(Q)
+        {
+            case 1: printf("Enter desired percentage : ");
+                    scanf("%f",&Dperc);
+                    r=(Dperc*0.01*(N+lectures))-n;
+                    r=lectures-r;
+                    printf("The number of lectures you may leave still managing %f percent attendance : %d\n",Dperc,r);
+                    if (r<0)    printf("Impossible, perhaps, achieving %f, even attending all upcoming lectures.",Dperc);
+                    break;
+            case 2:
+                    r=(0.767*(N+lectures))-n;
+                    r=lectures-r;
+                    printf("The number of lectures you may leave readily managing 75 percent attendance : %d",r);
+                    break;
+            case 3: r=(0.767*(N+lectures))-n;
+                    printf("The number of lectures you need to attend to achieve the bare minimum : %d",r);
+                    break;
+            case 4: perc=((n+lectures)*100)/(N+lectures);
+                    printf("Your percentage given you pull off the feat successfully : %f",perc);
+                    break;
+            default: printf("Seriously?! \n What are you doing?!!");
+        }
+    }
+    if(att>=90)
+    {
+        printf(" Why are you here, Dudette or Dude? \nChoose your query\n\n1 ->How many lectures can I leave still maintaining a particular percentage? \n2 ->I wish to experience the attendance conundrum...\n3 ->What if I attend all lectures until next internal?((Becoz I am super nerdy))\n4 ->What if I leave all?\n");
+        scanf("%d",&Q);
+        switch(Q)
+        {
+            case 1: printf("Enter desired percentage : ");
+                    scanf("%f",&Dperc);
+                    r=(Dperc*0.01*(N+lectures))-n;
+                    r=lectures-r;
+                    printf("The number of lectures you may leave, still managing %f percent attendance : %d",Dperc,r);
+                    if(r<0) printf("\nAlas! Only if %d was a possibility!!!",r);
+                    break;
+            case 2:
+                    r=(0.767*(N+lectures))-n;
+                    r=lectures-r;
+                    printf("The number of lectures you will have to leave to be able to understand the pain of every third person in your class : %d",r);
+                    break;
+            case 3: perc=((float)(n+lectures)*100)/(float)(N+lectures);
+                    printf("Your percentage given you pull off the feat successfully : %f",perc);
+                    break;
+            case 4: perc=(float)(n*100)/(float)(N+lectures);
+                    printf("Your percentage given you pull off this ambitious feat successfully : %f",perc);
+                    if(perc<75) printf("Not recommended!");
+                    break;
+            default: printf("Seriously?! \n What are you doing?!!");
+        }
+    }
+    return 0;
+}
